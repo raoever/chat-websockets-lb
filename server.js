@@ -1,3 +1,4 @@
+const portaPadrao = 8001
 const express = require('express')
 const app = express()
 
@@ -5,17 +6,16 @@ app.use(express.static("public"))
 
 const http = require('http').Server(app)
 const serverSocket = require('socket.io')(http)
+serverSocket.set('transports', ['websockets'])
 
-const porta = process.env.PORT || 8000
+const porta = process.argv.length == 3 ? process.argv[2] : process.env.PORT || portaPadrao;
 
 const host = process.env.HEROKU_APP_NAME ? `https://${process.env.HEROKU_APP_NAME}.herokuapp.com` : "http://localhost"
 
 http.listen(porta, function(){
-    const portaStr = porta === 80 ? '' :  ':' + porta
-
     if (process.env.HEROKU_APP_NAME) 
         console.log('Servidor iniciado. Abra o navegador em ' + host)
-    else console.log('Servidor iniciado. Abra o navegador em ' + host + portaStr)
+    else console.log('Servidor iniciado. Abra o navegador no endereço do Balanceador de Carga')
 })
 
 app.get('/', function (requisicao, resposta) {
